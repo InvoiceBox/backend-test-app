@@ -1,0 +1,123 @@
+### Основные библиотеки:
+
+- Валидация - https://symfony.com/doc/current/validation.html
+- Сериализация / десериализация / нормализация данных - https://symfony.com/doc/current/components/serializer.html
+- Работа с базой данных
+    - https://symfony.com/doc/current/doctrine.html
+    - https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html
+- Логирование https://symfony.com/doc/current/logging.html
+- Роутинг https://symfony.com/doc/current/routing.html
+- Тестирование:
+    - https://symfony.com/doc/current/testing.html
+    - https://symfony.com/doc/current/bundles/DoctrineFixturesBundle/index.html
+
+### Структура проекта
+
+Проект разделен на 4 слоя (своя трактовка слоистой архитектуры):
+
+#### Presentation
+
+Слой точек взаимодействия с приложениями с конечным пользователем. Основные сущности: контроллеры и консольные команды. В этом слое не должно
+быть бизнес логики, а типовыми задачами является:
+
+- валидация входящих данных
+- десериализация/сериализация входящих/исходящих данных
+- запуск обработчиков Application слоя
+
+#### Infrastructure
+
+Слой сервисов для работы с внешними приложениями, например:
+
+- репозитории работы с базами данных
+- http клиенты по работе с внешними сервисами по API
+- RPC клиенты
+
+#### Application
+
+Слой реализации бизнес логики. В нем используются модели из Domain слоя, а так же обработчики из
+Infrastructure.
+
+#### Domain
+
+Слой, где находятся модели бизнес логики.
+
+### Запуск приложения локально
+
+Для локального запуска проекта требуется:
+
+- composer (php8)
+- docker
+- bash интерпретатор
+
+Для запуска выполните команду: `./build/run-local.sh`, которая через docker-compose запустит следующие
+контейнеры:
+
+- nginx - `localhost:6082`
+- php - php-fpm сервер
+- pg-test - база данных для выполнения тестов (`postgresql://test:test@localhost:5944/test`)
+- pg - локальная база данных приложения (`postgresql://db_user:db_password@127.0.0.1:5943/backend-test-app`)
+
+### Тесты
+
+- основной файл настроек тестового окружения находится в корне проекта в файле phpunit.xml
+- ручной запуск тестов `php ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml`
+
+### Роутинг
+
+Основные настройки роутинга находятся в `config/routes.yaml`. Так же тут прописаны группы сериализации по умолчанию.
+
+### Авторизация
+
+Авторизация тестового приложения реализована через проверку заголовка `X-USER-ID` 
+
+### Группы сериализации
+
+Для заполнения полей объектов данными из http запросов(json) используется компонент symfony/serializer. Для каждого поля
+класса можно задать свой список групп сериализации (аннотация `@Groups`). 
+
+#### Рассмотрим на примере следующего класса:
+
+```php
+class Example
+{
+  /**
+  * @Groups({"read"})
+  */
+  private int $id;
+  
+  /**
+  * @Groups({"read", "create"})
+  */
+  private string $title;
+  
+  /**
+  * @Groups({"read", "update"})
+  */
+  private string $description;
+}
+```
+Заполнение полей объекта из json:
+```json
+{"id":123, "title": "Example title", "description": "test"}
+```
+```php
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'create']);
+// Создаст экземпляр класса только с одним заполненным полем - title
+
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'update']);
+// Создаст экземпляр класса только с одним заполненным полем - description
+
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'read']);
+// Создаст экземпляр класса с заполненными полями: id, title и description
+```
+
+Получение json представление объекта:
+```php
+$example = new Example();
+$example->setId(1);
+$example->setTitle('Title');
+$example->setDescription('Description');
+
+$data = $serializer->serialize($example, 'json', ['groups'=> 'read']);
+// {"id":1, "title": "Title", "description": "Description"}
+```

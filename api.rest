@@ -1,0 +1,17 @@
+###
+GET http://localhost:6082/api/example?_order[id]=desc&_pageSize=10
+X-USER-ID: 123
+
+###
+POST http://localhost:6082/api/example
+Content-Type: application/json
+X-USER-ID: 123
+
+{"title":  "title", "description":  "description"}
+
+###
+PUT http://localhost:6082/api/example/1
+Content-Type: application/json
+X-USER-ID: 123
+
+{"title":  "new title", "description":  "new description"}

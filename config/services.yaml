@@ -1,0 +1,28 @@
+parameters:
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  BackendTestApp\:
+    resource: '../src/'
+    exclude:
+      - '../src/Domain/'
+      - '../src/Application/DTO/'
+      - '../src/Presentation/JsonResponse.php'
+      - '../src/Kernel.php'
+
+  BackendTestApp\Presentation\Controller\:
+    resource: '../src/Presentation/Controller/'
+    tags: [ 'controller.service_arguments' ]
+
+
+  BackendTestApp\Presentation\ErrorResponseListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.exception, priority: 100 }
+
+  BackendTestApp\Presentation\SecurityListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, priority: 20 }

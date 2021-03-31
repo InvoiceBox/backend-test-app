@@ -1,0 +1,10 @@
+api:
+  resource: ../src/Presentation/Controller
+  type: annotation
+  prefix: /api/
+  name_prefix: 'api_'
+  defaults:
+    readSerializationGroups: [read]
+    createDeserializationGroups: [create]
+    updateDeserializationGroups: [update]
+

@@ -1,0 +1,52 @@
+version: '3.8'
+networks:
+  default:
+    name: invoicebox_local
+    external: true
+
+volumes:
+  database:
+    name: local_backend-test-app_database
+    external: true
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "6082:80"
+    volumes:
+      - ./build/nginx.conf:/etc/nginx/nginx.conf
+
+  php:
+    build:
+      context: ./build/
+    volumes:
+      - ./:/app:cached
+      - ./build/www.conf:/usr/local/etc/php-fpm.d/www.conf
+    env_file:
+      - .env.docker
+
+  pg-test:
+    image: postgres:13
+    tmpfs:
+      - /var/lib/postgresql/data
+    ports:
+      - "5944:5432"
+    environment:
+      - DB_PASS=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+      - POSTGRES_INITDB_ARGS=-N
+
+  pg:
+    image: postgres:13
+    ports:
+      - "5943:5432"
+    environment:
+      - POSTGRES_PASSWORD=db_password
+      - POSTGRES_DB=backend-test-app
+      - POSTGRES_USER=db_user
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - database:/var/lib/postgresql/data/pgdata

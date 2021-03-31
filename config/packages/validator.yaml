@@ -1,0 +1,5 @@
+framework:
+  validation:
+    enable_annotations: true
+    auto_mapping:
+      BackendTestApp\Domain\Entity\: [ ]

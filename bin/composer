@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if hash composer 2>/dev/null; then
+  composer $@
+  exit 0;
+fi
+
+echo 'Composer not found';
+exit 1;
