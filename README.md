@@ -1,16 +1,39 @@
-### Основные библиотеки:
+## Тестовое задание
+### Задача
+Разработать API по работе с заказами интернет-магазина. 
 
-- Валидация - https://symfony.com/doc/current/validation.html
-- Сериализация / десериализация / нормализация данных - https://symfony.com/doc/current/components/serializer.html
-- Работа с базой данных
-    - https://symfony.com/doc/current/doctrine.html
-    - https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html
-- Логирование https://symfony.com/doc/current/logging.html
-- Роутинг https://symfony.com/doc/current/routing.html
-- Тестирование:
-    - https://symfony.com/doc/current/testing.html
-    - https://symfony.com/doc/current/bundles/DoctrineFixturesBundle/index.html
+Согласно требованиям ТЗ, заказ создается в два этапа: 
+1) Создание пустого заказа
+2) Добавление в заказ товаров поштучно
 
+Набор данных в заказе:
+- идентификатор заказа
+- идентификатор пользователя
+- сумма заказа
+- дата создания заказа
+
+Набор данных в товаре:
+- артикул
+- название
+- стоимость единицы товара
+- кол-во единиц товара
+- суммарная стоимость всех единиц товара
+
+От API требуются следующие возможности:
+- [ ] Создание заказа и привязка его к текущему пользователю (см. [Авторизация](#Авторизация))
+- [ ] Добавление в заказ нового товара (необходим пересчет итоговой суммы заказа)
+- [ ] Удаление из заказа товаров (необходим пересчет итоговой суммы заказа)
+- [ ] Редактирование заказа
+- [ ] Удаление заказа
+- [ ] Получение списка заказов
+
+### Оформление работы
+- Результат необходимо оформить в виде Pull Request в этот репозиторий.
+- Разработка должна вестись на основе [Бойлерплейта](#Бойлерплейт), применяя используемые в нем библиотеки. В бойлерплейте есть примеры оформления API для сущности `/example`
+- Необходимо написать тесты на реализованные ресурсы. В бойлерплейте есть примеры оформления.
+- Необходимо предусмотреть проверки на консистентность данных в заказе
+
+## Бойлерплейт
 ### Структура проекта
 
 Проект разделен на 4 слоя (своя трактовка слоистой архитектуры):
@@ -121,3 +144,16 @@ $example->setDescription('Description');
 $data = $serializer->serialize($example, 'json', ['groups'=> 'read']);
 // {"id":1, "title": "Title", "description": "Description"}
 ```
+
+
+### Основные библиотеки:
+- Валидация - https://symfony.com/doc/current/validation.html
+- Сериализация / десериализация / нормализация данных - https://symfony.com/doc/current/components/serializer.html
+- Работа с базой данных
+  - https://symfony.com/doc/current/doctrine.html
+  - https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html
+- Логирование https://symfony.com/doc/current/logging.html
+- Роутинг https://symfony.com/doc/current/routing.html
+- Тестирование:
+  - https://symfony.com/doc/current/testing.html
+  - https://symfony.com/doc/current/bundles/DoctrineFixturesBundle/index.html
