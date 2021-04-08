@@ -96,11 +96,13 @@ Infrastructure.
 ### Группы сериализации
 
 Для заполнения полей объектов данными из http запросов(json) используется компонент symfony/serializer. Для каждого поля
-класса можно задать свой список групп сериализации (аннотация `@Groups`). 
+класса можно задать свой список групп сериализации, напрмиер для JMS Serializer через аннотацию `@JMS\Serializer\Annotation\Groups`. 
 
 #### Рассмотрим на примере следующего класса:
 
 ```php
+use JMS\Serializer\Annotation\Groups;
+
 class Example
 {
   /**
@@ -124,13 +126,13 @@ class Example
 {"id":123, "title": "Example title", "description": "test"}
 ```
 ```php
-$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'create']);
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', DeserializationContext::create()->setGroups(['create']));
 // Создаст экземпляр класса только с одним заполненным полем - title
 
-$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'update']);
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', DeserializationContext::create()->setGroups(['update']));
 // Создаст экземпляр класса только с одним заполненным полем - description
 
-$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', ['groups'=> 'read']);
+$data = $serializer->deserialize('{"id":123, "title": "Example title", "description": "test"}', Example::class, 'json', DeserializationContext::create()->setGroups(['read']));
 // Создаст экземпляр класса с заполненными полями: id, title и description
 ```
 
@@ -141,14 +143,14 @@ $example->setId(1);
 $example->setTitle('Title');
 $example->setDescription('Description');
 
-$data = $serializer->serialize($example, 'json', ['groups'=> 'read']);
+$data = $serializer->serialize($example, 'json', SerializationContext::create()->setGroups(['read']));
 // {"id":1, "title": "Title", "description": "Description"}
 ```
 
 
 ### Основные библиотеки:
 - Валидация - https://symfony.com/doc/current/validation.html
-- Сериализация / десериализация / нормализация данных - https://symfony.com/doc/current/components/serializer.html
+- Сериализация / десериализация / нормализация данных - https://jmsyst.com/libs/serializer
 - Работа с базой данных
   - https://symfony.com/doc/current/doctrine.html
   - https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html

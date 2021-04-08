@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackendTestApp\Presentation;
+namespace BackendTestApp\Presentation\Serializer;
 
 use Symfony\Component\HttpFoundation\JsonResponse as BaseResponse;
 

@@ -6,7 +6,7 @@ namespace BackendTestApp\Domain\Entity;
 
 use BackendTestApp\Infrastructure\Repository\ExampleRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

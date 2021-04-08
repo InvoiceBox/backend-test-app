@@ -26,3 +26,7 @@ services:
   BackendTestApp\Presentation\SecurityListener:
     tags:
       - { name: kernel.event_listener, event: kernel.request, priority: 20 }
+
+  jms_serializer.unserialize_object_constructor:
+    class: BackendTestApp\Presentation\Serializer\ObjectConstructor
+    public: true

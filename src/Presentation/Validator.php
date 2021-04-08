@@ -8,6 +8,7 @@ use BackendTestApp\Domain\Exception\FieldErrorCollection;
 use BackendTestApp\Domain\Exception\Validation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use BackendTestApp\Presentation\Serializer\JsonSerializer;
 
 class Validator
 {

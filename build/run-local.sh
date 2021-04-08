@@ -8,4 +8,5 @@ bin/composer 'install --ignore-platform-reqs --no-scripts'
 
 docker-compose build
 docker-compose -p invoicebox-backend-test-app -f ./docker-compose.yml up -d
+sleep 5
 ./bin/console doctrine:schema:update --force

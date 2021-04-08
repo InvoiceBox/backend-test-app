@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BackendTestApp\Presentation;
+namespace BackendTestApp\Presentation\Serializer;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\ArrayTransformerInterface;
+use Doctrine\DBAL\Types\Types;
+use JMS\Serializer\DeserializationContext;
+use JMS\Serializer\SerializationContext;
 
 class JsonSerializer
 {
     public const DEFAULT_GROUP = 'Default';
 
-    public function __construct(private SerializerInterface $serializer, private NormalizerInterface $normalizer)
+    public function __construct(private SerializerInterface $serializer, private ArrayTransformerInterface $transformer)
     {
     }
 
@@ -26,11 +27,10 @@ class JsonSerializer
         return $this->serializer->deserialize(
             $content,
             $class,
-            JsonEncoder::FORMAT,
-            [
-                AbstractNormalizer::GROUPS => $groups,
-                AbstractNormalizer::OBJECT_TO_POPULATE => $existsObject
-            ]
+            Types::JSON,
+            DeserializationContext::create()
+                ->setAttribute('target', $existsObject)
+                ->setGroups($groups)
         );
     }
 
@@ -38,18 +38,17 @@ class JsonSerializer
     {
         return $this->serializer->serialize(
             $object,
-            JsonEncoder::FORMAT,
-            [AbstractNormalizer::GROUPS => $groups],
+            Types::JSON,
+            SerializationContext::create()->setGroups($groups)
         );
     }
 
     public function createJsonResponse(object|array $object, ?array $groups = null): JsonResponse
     {
         return new JsonResponse(
-            $this->normalizer->normalize(
+            $this->transformer->toArray(
                 $object,
-                JsonEncoder::FORMAT,
-                [AbstractNormalizer::GROUPS => $groups],
+                SerializationContext::create()->setGroups($groups),
             )
         );
     }
