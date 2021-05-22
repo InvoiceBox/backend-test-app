@@ -108,8 +108,8 @@ class TestCase extends WebTestCase
         return $this->doRequest('PUT', $url, $params, $headers);
     }
 
-    protected function doDeleteRequest(string $url, array $headers = []): array
+    protected function doDeleteRequest(string $url, $params = [], array $headers = []): array
     {
-        return $this->doRequest('DELETE', $url, [], $headers);
+        return $this->doRequest('DELETE', $url, $params, $headers);
     }
 }

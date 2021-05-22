@@ -15,3 +15,61 @@ Content-Type: application/json
 X-USER-ID: 123
 
 {"title":  "new title", "description":  "new description"}
+
+###products
+
+GET http://localhost:6082/api/product
+X-USER-ID: 123
+
+
+###
+POST http://localhost:6082/api/product
+Content-Type: application/json
+X-USER-ID: 123
+
+{"sku": "sddfo4fof", "title": "product 3","price": 200, "qty": 1}
+
+###
+DELETE http://localhost:6082/api/product/11
+Content-Type: application/json
+X-USER-ID: 123
+
+
+### Order
+GET http://localhost:6082/api/order
+X-USER-ID: 123
+
+### create empty order
+POST http://localhost:6082/api/order
+Content-Type: application/json
+X-USER-ID: 123
+
+{}
+
+### update order
+PUT http://localhost:6082/api/order/1
+Content-Type: application/json
+X-USER-ID: 123
+
+{}
+
+### delete
+DELETE http://localhost:6082/api/order/3
+Content-Type: application/json
+X-USER-ID: 123
+
+### add to order
+POST http://localhost:6082/api/addToOrder
+Content-Type: application/json
+X-USER-ID: 123
+
+{"order_id": 3, "product_id": 12}
+
+### delete item order
+DELETE http://localhost:6082/api/removeItemOrder
+Content-Type: application/json
+X-USER-ID: 123
+
+{"order_id": 1, "product_id": 12}
+
+
