@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BackendTestApp\Presentation\Controller;
 
-use BackendTestApp\Application\DTO\AddToOrderRequest;
 use BackendTestApp\Application\ProductService;
 use BackendTestApp\Domain\Entity\Product;
 use BackendTestApp\Application\DTO\ProductFilter;
@@ -12,7 +11,6 @@ use BackendTestApp\Presentation\AuthenticationManager;
 use BackendTestApp\Presentation\Serializer\JsonResponse;
 use BackendTestApp\Presentation\Serializer\JsonSerializer;
 use BackendTestApp\Presentation\Validator;
-use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 

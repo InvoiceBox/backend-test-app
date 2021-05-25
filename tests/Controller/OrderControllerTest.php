@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BackendTestApp\Tests\Controller;
 
-use BackendTestApp\Domain\Entity\OrderItem;
 use BackendTestApp\Infrastructure\Repository\OrderItemRepository;
 use BackendTestApp\Infrastructure\Repository\OrderRepository;
 use BackendTestApp\Infrastructure\Repository\ProductRepository;
