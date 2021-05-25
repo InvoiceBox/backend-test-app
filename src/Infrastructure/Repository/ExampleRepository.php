@@ -53,3 +53,4 @@ class ExampleRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 }
+

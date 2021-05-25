@@ -32,9 +32,8 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=OrderItem::class, mappedBy="order", cascade={"persist", "remove"}, orphanRemoval=true)
      * @Groups({"read"})
-     * @var ArrayCollection
      */
-    private $items;
+    private Collection $items;
 
 
     /**
@@ -42,15 +41,15 @@ class Order
      * @ORM\Column(type="bigint")
      * @Groups({"read"})
      */
-    private int $total_price = 0;
+    private int $totalPrice = 0;
 
 
     /**
      * @Assert\Type(type="\DateTimeInterface")
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
      * @Groups({"read"})
      */
-    private \DateTimeInterface $created_at;
+    private \DateTimeInterface $createdAt;
 
     /**
      * @ORM\Column(type="bigint", nullable=true)
@@ -70,7 +69,6 @@ class Order
     }
 
     /**
-     * @return Collection|OrderItem[]
      */
     public function getItems(): Collection
     {
@@ -86,6 +84,17 @@ class Order
     {
         foreach ($this->getItems() as $item){
             if ($item->hasProductId($id)){
+                return $item;
+            }
+        }
+        return null;
+    }
+
+
+    public function getItemById(int $id): ?OrderItem
+    {
+        foreach ($this->getItems() as $item){
+            if ($item->getId() === $id){
                 return $item;
             }
         }
@@ -139,7 +148,7 @@ class Order
      */
     public function getTotalPrice(): int
     {
-        return $this->total_price;
+        return $this->totalPrice;
     }
 
     /**
@@ -147,7 +156,7 @@ class Order
      */
     public function setTotalPrice(int $price): void
     {
-        $this->total_price = $price;
+        $this->totalPrice = $price;
     }
 
 
@@ -156,15 +165,15 @@ class Order
      */
     public function getCreatedAt(): \DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     /**
-     * @param mixed $created_at
+     * @param mixed $createdAt
      */
-    public function setCreatedAt(\DateTimeInterface $created_at): void
+    public function setCreatedAt(\DateTimeInterface $createdAt): void
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
     }
 
 
@@ -183,8 +192,7 @@ class Order
      */
     public function setCreatedAtValue()
     {
-
-        $this->created_at = new \DateTime("now");
+        $this->setCreatedAt(new \DateTime("now"));
     }
 
     /**
@@ -192,7 +200,7 @@ class Order
      */
     public function setSumQtyValue()
     {
-        $this->total_price = $this->getTotal();
+        $this->setTotalPrice($this->getTotal());
     }
 
     /**

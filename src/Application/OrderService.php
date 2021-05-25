@@ -6,6 +6,8 @@ namespace BackendTestApp\Application;
 
 use BackendTestApp\Application\DTO\OrderFilter;
 use BackendTestApp\Domain\Entity\Order;
+use BackendTestApp\Domain\Entity\OrderItem;
+use BackendTestApp\Domain\Entity\Product;
 use BackendTestApp\Infrastructure\Repository\OrderRepository;
 use Psr\Log\LoggerInterface;
 
@@ -58,4 +60,48 @@ class OrderService
     {
         $this->orderRepository->delete($order);
     }
+
+
+    /**
+     * @param \BackendTestApp\Domain\Entity\Order $order
+     * @param Product $product
+     */
+    public function addProduct(Order $order, Product $product)
+    {
+        $item = new OrderItem();
+        $item->setProduct($product);
+        $order->addItem($item);
+        $this->update($order);
+    }
+
+    /**
+     * @param \BackendTestApp\Domain\Entity\Order $order
+     * @param int $productId
+     */
+    public function deleteProduct(Order $order, int $productId)
+    {
+        $item = $order->getItemByProductId($productId);
+        $order->deleteItem($item);
+        $this->update($order);
+    }
+
+    /**
+     *
+     */
+    public function deleteItems(Order $order)
+    {
+        $order->deleteAllItems();
+        $this->update($order);
+    }
+
+    /**
+     *
+     */
+    public function deleteItem(Order $order, int $itemId)
+    {
+        $item = $order->getItemById($itemId);
+        $order->deleteItem($item);
+        $this->update($order);
+    }
 }
+

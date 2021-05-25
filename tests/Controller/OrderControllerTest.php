@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace BackendTestApp\Tests\Controller;
 
+use BackendTestApp\Domain\Entity\OrderItem;
+use BackendTestApp\Infrastructure\Repository\OrderItemRepository;
 use BackendTestApp\Infrastructure\Repository\OrderRepository;
 use BackendTestApp\Infrastructure\Repository\ProductRepository;
 use BackendTestApp\Tests\TestCase;
 
 class OrderControllerTest extends TestCase
 {
+    protected OrderItemRepository $orderItemRepository;
     protected OrderRepository $orderRepository;
     protected ProductRepository $productRepository;
     protected int $currentUserId;
@@ -50,7 +53,6 @@ class OrderControllerTest extends TestCase
             '/api/order',
             []
         );
-
         $this->assertArrayHasKey('data', $response);
         $this->assertTrue($response['data']['id'] > 0);
 
@@ -85,6 +87,7 @@ class OrderControllerTest extends TestCase
 
         return $response['data']['id'];
     }
+
     /**
      * @test
      */
@@ -94,11 +97,10 @@ class OrderControllerTest extends TestCase
 
         $response = $this->doPutRequest(
             '/api/order/' . $orderId,
-            ['total_price' => $total_price = '0']
+            []
         );
 
         $this->assertArrayHasKey('data', $response);
-        $this->assertEquals($total_price, $response['data']['total_price']);
     }
 
     /**
@@ -213,12 +215,83 @@ class OrderControllerTest extends TestCase
 
     }
 
+
+    /**
+     * @test
+     */
+    public function removeItemToOrder()
+    {
+        $orderId = $this->create();
+        $product = $this->productRepository->getById($this->createProduct());
+
+        $response = $this->doPostRequest('/api/addToOrder', [
+            "order_id" => $orderId,
+            "product_id" => $product->getId(),
+        ]);
+
+        $sumItem = array_sum(array_map(function ($item) {
+            return $item['product']['price'] * $item['qty'];
+        }, $response['data']['items']));
+
+
+        $this->assertArrayHasKey('data', $response);
+        $this->assertTrue($response['data']['id'] > 0);
+
+        $item = $this->orderItemRepository->getById($response['data']['items'][0]['id']);
+
+        $this->assertEquals($response['data']['items'][0]['id'], $item->getId());
+        $this->assertEquals($response['data']['total_price'], $sumItem);
+
+        $response = $this->doDeleteRequest('/api/removeItemById', [
+            "order_id" => $orderId,
+            "item_id" => $item->getId(),
+        ]);
+
+        $this->assertEquals($response['data']['items'], []);
+        $this->assertNotEquals($response['data']['total_price'], $sumItem);
+
+    }
+
+
+    /**
+     * @test
+     */
+    public function removeAllItemsToOrder()
+    {
+        $orderId = $this->create();
+        $productOne = $this->productRepository->getById($this->createProduct());
+        $productTwo = $this->productRepository->getById($this->createProduct());
+
+        $response = $this->doPostRequest('/api/addToOrder', [
+            "order_id" => $orderId,
+            "product_id" => $productOne->getId(),
+        ]);
+
+        $response = $this->doPostRequest('/api/addToOrder', [
+            "order_id" => $orderId,
+            "product_id" => $productTwo->getId(),
+        ]);
+
+        $this->assertTrue(count($response['data']['items']) > 0);
+
+        $response = $this->doDeleteRequest('/api/removeAllItems/' . $orderId);
+        $this->assertArrayHasKey('data', $response);
+        $this->assertEquals([], $response['data']['items']);
+        $this->assertEquals(0, $response['data']['total_price']);
+
+    }
+
+
+
+
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->currentUserId = 100;
         $this->orderRepository = $this->client->getContainer()->get(OrderRepository::class);
+        $this->orderItemRepository = $this->client->getContainer()->get(OrderItemRepository::class);
         $this->productRepository = $this->client->getContainer()->get(ProductRepository::class);
     }
 

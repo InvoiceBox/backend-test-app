@@ -38,3 +38,4 @@ class QueryFilter
         return $this->order;
     }
 }
+

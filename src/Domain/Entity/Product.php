@@ -60,15 +60,15 @@ class Product
      * @ORM\Column(type="bigint")
      * @Groups({"read"})
      */
-    private int $sum_qty = 0;
+    private int $sumQty = 0;
 
 
     /**
      * @Assert\Type(type="\DateTimeInterface", message="Custom Message")
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
      * @Groups({"read"})
      */
-    private \DateTimeInterface $created_at;
+    private \DateTimeInterface $createdAt;
 
     /**
      * @ORM\Column(type="bigint", nullable=true)
@@ -144,15 +144,15 @@ class Product
      */
     public function getSumQty(): int
     {
-        return $this->sum_qty;
+        return $this->sumQty;
     }
 
     /**
-     * @param int $sum_qty
+     * @param int $sumQty
      */
-    public function setSumQty(int $sum_qty): void
+    public function setSumQty(int $sumQty): void
     {
-        $this->sum_qty = $sum_qty;
+        $this->sumQty = $sumQty;
     }
 
     /**
@@ -160,15 +160,15 @@ class Product
      */
     public function getCreatedAt(): \DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     /**
-     * @param mixed $created_at
+     * @param mixed $createdAt
      */
-    public function setCreatedAt(\DateTimeInterface $created_at): void
+    public function setCreatedAt(\DateTimeInterface $createdAt): void
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
     }
 
 
@@ -188,7 +188,7 @@ class Product
      */
     public function setCreatedAtValue()
     {
-        $this->created_at = new \DateTime("now");
+        $this->setCreatedAt(new \DateTime("now"));
 
     }
 
@@ -197,6 +197,6 @@ class Product
      */
     public function setSumQtyValue()
     {
-        $this->sum_qty = $this->qty * $this->price;
+        $this->sumQty = $this->qty * $this->price;
     }
 }

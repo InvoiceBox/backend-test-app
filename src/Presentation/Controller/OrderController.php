@@ -123,27 +123,52 @@ class OrderController
     public function addToOrder(Request $request, array $readSerializationGroups): JsonResponse
     {
         $requestDetail = $this->serializer->deserialize($request->getContent(), AddToOrderRequest::class, $readSerializationGroups);
-        $order = $this->orderService->getById($requestDetail->order_id);
+        $order = $this->orderService->getById($requestDetail->orderId);
         $this->privateAuthenticationManager->checkCurrentUserId($order->getUserId());
-        $product = $this->productService->getById($requestDetail->product_id);
-        $item = new OrderItem();
-        $item->setProduct($product);
-        $order->addItem($item);
-        $this->orderService->update($order);
+        $product = $this->productService->getById($requestDetail->productId);
+        $this->orderService->addProduct($order, $product);
         return $this->serializer->createJsonResponse($order, $readSerializationGroups);
     }
 
     #[Route('/removeItemOrder', name: 'remove_itemOrder', methods: ['DELETE'])]
-    public function removeItemOrder(Request $request, array $readSerializationGroups, OrderItemRepository $orderItemRepository): JsonResponse
-    {
-        $requestDetail = $this->serializer->deserialize($request->getContent(), AddToOrderRequest::class, $readSerializationGroups);
-        $order = $this->orderService->getById($requestDetail->order_id);
+    public function removeItemOrder(
+        Request $request,
+        array $readSerializationGroups,
+    ): JsonResponse {
+        $requestDetail = $this->serializer->deserialize(
+            $request->getContent(),
+            AddToOrderRequest::class,
+            $readSerializationGroups
+        );
+        $order = $this->orderService->getById($requestDetail->orderId);
         $this->privateAuthenticationManager->checkCurrentUserId($order->getUserId());
-        $item = $order->getItemByProductId($requestDetail->product_id);
-        $order->deleteItem($item);
-        $this->orderService->update($order);
+        $this->orderService->deleteProduct($order, $requestDetail->productId);
         return $this->serializer->createJsonResponse($order, $readSerializationGroups);
     }
 
+    #[Route('/removeItemById', name: 'remove_itemById', methods: ['DELETE'])]
+    public function removeItemById( Request $request, array $readSerializationGroups): JsonResponse
+    {
+
+        $requestDetail = $this->serializer->deserialize(
+            $request->getContent(),
+            AddToOrderRequest::class,
+            $readSerializationGroups
+        );
+        $order = $this->orderService->getById($requestDetail->orderId);
+        $this->privateAuthenticationManager->checkCurrentUserId($order->getUserId());
+        $this->orderService->deleteItem($order, $requestDetail->itemId);
+        return $this->serializer->createJsonResponse($order, $readSerializationGroups);
+    }
+
+    #[Route('/removeAllItems/{id}', name: 'remove_allItems', methods: ['DELETE'])]
+    public function removeAllItems(int $id, $readSerializationGroups): JsonResponse
+    {
+        $order = $this->orderService->getById($id);
+        $this->privateAuthenticationManager->checkCurrentUserId($order->getUserId());
+        $this->orderService->deleteItems($order);
+        return $this->serializer->createJsonResponse($order, $readSerializationGroups);
+    }
 
 }
+

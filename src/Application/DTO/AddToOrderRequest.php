@@ -11,12 +11,18 @@ final class AddToOrderRequest
      * @Groups({"read"})
      * @var int|null
      */
-    public ?int $order_id = null;
+    public ?int $orderId = null;
 
 
     /**
      * @Groups({"read"})
      * @var int|null
      */
-    public ?int $product_id = null;
+    public ?int $productId = null;
+
+    /**
+     * @Groups({"read"})
+     * @var int|null
+     */
+    public ?int $itemId = null;
 }

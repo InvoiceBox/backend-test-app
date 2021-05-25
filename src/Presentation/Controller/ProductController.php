@@ -79,7 +79,6 @@ class ProductController
             Product::class,
             $createDeserializationGroups
         );
-
         $this->validator->validate($product, $createDeserializationGroups);
         $this->productService->create($product, $this->privateAuthenticationManager->getCurrentUserId());
 
@@ -101,7 +100,6 @@ class ProductController
             $updateDeserializationGroups
         );
         $this->validator->validate($product, $updateDeserializationGroups);
-
         $product = $this->productService->getById($id);
         $this->privateAuthenticationManager->checkCurrentUserId($product->getUserId());
         $product = $this->serializer->deserialize(
@@ -115,7 +113,5 @@ class ProductController
 
         return $this->serializer->createJsonResponse($product, $readSerializationGroups);
     }
-
-
 
 }
