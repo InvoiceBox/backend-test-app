@@ -23,6 +23,7 @@ class Example
      */
     private int $id;
 
+
     /**
      * @Assert\NotBlank(groups={"create"})
      * @ORM\Column(type="string", length=100, nullable=false)
