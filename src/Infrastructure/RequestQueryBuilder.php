@@ -29,15 +29,16 @@ class RequestQueryBuilder
      */
     public function createQueryBuilder(string $class, QueryFilter $filter): QueryBuilder
     {
+
         $this->counter = 0;
         $this->metaData = $this->em->getMetadataFactory()->getMetadataFor($class);
+
         $this->queryBuilder = $this->em
             ->createQueryBuilder()
             ->select('t')
             ->from($class, 't');
         $this->processLimitOffset($filter->getPageSize(), $filter->getPage());
         $this->processOrders($filter->getOrder());
-
         return $this->queryBuilder;
     }
 

@@ -134,7 +134,7 @@ class ExampleControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->currentUserId = 100;
+        $this->currentUserId = 123;
         $this->exampleRepository = $this->client->getContainer()->get(ExampleRepository::class);
     }
 
