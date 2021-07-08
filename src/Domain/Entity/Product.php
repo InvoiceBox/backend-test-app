@@ -7,6 +7,7 @@ namespace BackendTestApp\Domain\Entity;
 use BackendTestApp\Infrastructure\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 
@@ -26,24 +27,40 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      * @Groups({"read", "create", "update"})
      */
     private string $title;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank
+     * @Assert\Type(
+     *     type="integer",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
      * @Groups({"read", "create", "update"})
      */
     private int $price;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank
+     * @Assert\Type(
+     *     type="integer",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
      * @Groups({"read", "create", "update"})
      */
     private int $count;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\NotBlank
+     * @Assert\Type(
+     *     type="integer",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
      * @Groups({"read", "create", "update"})
      */
     private ?int $priceForAll;
@@ -112,15 +129,5 @@ class Product
         $this->priceForAll = $priceForAll;
 
         return $this;
-    }
-
-    public function updateRemoveCountAndPriceForAll(){
-        $this->setCount($this->count - 1);
-        $this->setPriceForAll($this->count * $this->price);
-    }
-
-    public function updateAddCountAndPriceForAll(){
-        $this->setCount($this->count + 1);
-        $this->setPriceForAll($this->count * $this->price);
     }
 }

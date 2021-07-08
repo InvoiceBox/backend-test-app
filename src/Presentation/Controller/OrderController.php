@@ -5,10 +5,11 @@ namespace BackendTestApp\Presentation\Controller;
 
 
 use BackendTestApp\Application\DTO\ExampleFilter;
+use BackendTestApp\Application\DTO\ProductByIdAndCount;
+use BackendTestApp\Application\DTO\QueryFilter;
 use BackendTestApp\Application\OrderService;
 use BackendTestApp\Application\ProductService;
-use BackendTestApp\Domain\Entity\Product;
-use BackendTestApp\Domain\Entity\Orders;
+use BackendTestApp\Domain\Entity\Order;
 use BackendTestApp\Presentation\AuthenticationManager;
 use BackendTestApp\Presentation\Serializer\JsonResponse;
 use BackendTestApp\Presentation\Serializer\JsonSerializer;
@@ -27,16 +28,24 @@ class OrderController
     ) {
     }
 
-    //все заказы, в которые добавлен продукт
+
     #[Route('/order', name: 'find_order', methods: ['GET'])]
     public function find(
         Request $request,
         array $readSerializationGroups
     ): JsonResponse {
+        $filter = new QueryFilter($request->query->all());
 
-        $filter = new ExampleFilter($request->query->all());
 
-        $order = $this->orderService->findByFilter($filter, $this->privateAuthenticationManager->getCurrentUserId());
+        if ($id = $request->query->get("id")){
+            $order = $this->orderService->findByFilter($filter, $this->privateAuthenticationManager->getCurrentUserId(), $id);
+        }
+        else{
+            $order = $this->orderService->findByFilter($filter, $this->privateAuthenticationManager->getCurrentUserId());
+        }
+
+
+
         return $this->serializer->createJsonResponse($order, $readSerializationGroups);
     }
 
@@ -73,10 +82,10 @@ class OrderController
     ): JsonResponse {
         $order = $this->serializer->deserialize(
             $request->getContent(),
-            Orders::class,
+            Order::class,
             $createDeserializationGroups
         );
-
+        $order->setAmount(0);
         $this->validator->validate($order, $createDeserializationGroups);
         $this->orderService->create($order, $this->privateAuthenticationManager->getCurrentUserId());
 
@@ -93,7 +102,7 @@ class OrderController
     ): JsonResponse {
         $order = $this->serializer->deserialize(
             $request->getContent(),
-            Orders::class,
+            Order::class,
             $updateDeserializationGroups
         );
         $this->validator->validate($order, $updateDeserializationGroups);
@@ -103,7 +112,7 @@ class OrderController
 
         $order = $this->serializer->deserialize(
             $request->getContent(),
-            Orders::class,
+            Order::class,
             $updateDeserializationGroups,
             $order
         );
@@ -113,23 +122,32 @@ class OrderController
         return $this->serializer->createJsonResponse($order, $readSerializationGroups);
     }
 
-    #[Route('/order/{id}/addProduct_{idProduct}', name: 'insert_product_to_order', methods: ['PUT'])]
-    public function insert(
+    #[Route('/order/{id}/addProduct', name: 'add_product_to_order', methods: ['PUT'])]
+    public function add(
         int $id,
-        int $idProduct,
+        Request $request,
         array $readSerializationGroups,
+        array $updateDeserializationGroups,
     ): JsonResponse {
-        $product = $this->productService->getById($idProduct);
-        $order = $this->orderService->getById($id);
+        $products = $this->serializer->deserialize(
+            $request->getContent(),
+            ProductByIdAndCount::class,
+            $updateDeserializationGroups,
+        );
 
+        $order = $this->orderService->getById($id);
         $this->privateAuthenticationManager->checkCurrentUserId($order->getUserId());
 
-        $this->orderService->insertProduct($order, $product);
+        $products = $products->getCountAndId();
+
+        for ($i = 1; $i <= $products[1]; $i++){
+            $this->orderService->addProduct($order, $this->productService->getById($products[0]));
+        }
 
         return $this->serializer->createJsonResponse($order, $readSerializationGroups);
     }
 
-    #[Route('/order/{id}/removeProduct_{idProduct}', name: 'remove_product_from_order', methods: ['PUT'])]
+    #[Route('/order/{id}/product/{idProduct}', name: 'remove_product_from_order', methods: ['DELETE'])]
     public function remove(
         int $id,
         int $idProduct,

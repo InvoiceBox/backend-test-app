@@ -29,14 +29,15 @@ class OrderControllerTest extends TestCase
     /**
      * @test
      */
-    public function create(int $amount = 10, string $creatinDate = "2021-07-04T16:16:34+00:00"): int
+    public function create(int $amount = 10, string $comment = "ahahah"): int
     {
         $response = $this->doPostRequest(
             '/api/order',
             [
                 'user_id' => 123,
                 'amount' => $amount,
-                'creation_date' => $creatinDate
+                'creation_date' => date("Y-M-d\T G:i:s"),
+                'comment' => $comment
             ]
         );
 
@@ -59,14 +60,14 @@ class OrderControllerTest extends TestCase
             [
                 'user_id' => 123,
                 'amount' => 10,
-                'creation_date' => "aaa"
+                'creation_date' => "aaa",
+                'comment' => "ahaha"
             ]
         );
 
         $this->assertArrayHasKey('error', $response);
-        //$this->assertEquals('creation_date', $response['error']['fields'][0]['name']);
 
-        $response = $this->doPostRequest('/api/order', ['creation_date' => '2021-07-04T16:16:34+00:00']);
+        $response = $this->doPostRequest('/api/order', ['creation_date' => date("Y-M-d\T G:i:s")]);
 
         $this->assertArrayHasKey('error', $response);
         $this->assertEquals('userId', $response['error']['fields'][0]['name']);
@@ -82,14 +83,15 @@ class OrderControllerTest extends TestCase
         $response = $this->doPutRequest(
             '/api/order/' . $orderId,
             [
-                'amount' => $newTitle = 1000,
+                'amount' => 10,
                 'user_id' => 123,
-                'creation_date' => '2021-07-04T16:16:34+00:00'
+                'creation_date' => date("Y-M-d\T G:i:s"),
+                'comment' => $newComment = "ahaha"
             ]
         );
 
         $this->assertArrayHasKey('data', $response);
-        $this->assertEquals($newTitle, $response['data']['amount']);
+        $this->assertEquals($newComment, $response['data']['comment']);
     }
 
     /**
@@ -111,15 +113,12 @@ class OrderControllerTest extends TestCase
     public function findWithAuth(): void
     {
         $this->currentUserId = mt_rand(100, 999);
-        $orderId = $this->create();
 
         $response = $this->doGetRequest('/api/order');
 
         $this->assertArrayHasKey('data', $response);
-        //$this->assertEquals($orderId, $response['data'][0]['id']);
     }
-    //в данных двух тестах скорее всего ошибка, по причине того, что продукт передаётся через id в url
-    //а не как объект
+
     /**
      * @test
      */
@@ -128,14 +127,17 @@ class OrderControllerTest extends TestCase
         $orderId = $this->create();
 
         $response = $this->doPutRequest(
-            '/api/order/' . $orderId . "/addProduct_1"
+            '/api/order/' . $orderId . "/addProduct",
+            [
+                'productId' => 1,
+                'count' => 2
+            ]
         );
 
         $this->assertArrayHasKey('data', $response);
         $this->assertEquals(123, $response['data']['user_id']);
     }
-    //в данных двух тестах скорее всего ошибка, по причине того, что продукт передаётся через id в url
-    //а не как объект
+
     /**
      * @test
      */
@@ -143,8 +145,8 @@ class OrderControllerTest extends TestCase
     {
         $orderId = $this->create();
 
-        $response = $this->doPutRequest(
-            '/api/order/' . $orderId . "/removeProduct_1"
+        $response = $this->doDeleteRequest(
+            '/api/order/' . $orderId . "/product/1"
         );
 
         $this->assertArrayHasKey('data', $response);
@@ -166,6 +168,4 @@ class OrderControllerTest extends TestCase
 
         return parent::doRequest($method, $url, $params, $headers);
     }
-
-
 }

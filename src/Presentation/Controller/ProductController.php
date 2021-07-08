@@ -5,6 +5,7 @@ namespace BackendTestApp\Presentation\Controller;
 
 
 use BackendTestApp\Application\DTO\ExampleFilter;
+use BackendTestApp\Application\DTO\QueryFilter;
 use BackendTestApp\Application\ProductService;
 use BackendTestApp\Domain\Entity\Product;
 use BackendTestApp\Presentation\AuthenticationManager;
@@ -30,9 +31,9 @@ class ProductController
         array $readSerializationGroups
     ): JsonResponse {
 
-        $filter = new ExampleFilter($request->query->all());
+        $filter = new QueryFilter($request->query->all());
 
-        $product = $this->productService->findByFilter($filter, $this->privateAuthenticationManager->getCurrentUserId());
+        $product = $this->productService->findByFilter($filter);
         return $this->serializer->createJsonResponse($product, $readSerializationGroups);
 
 

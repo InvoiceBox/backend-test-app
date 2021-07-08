@@ -4,7 +4,7 @@
 namespace BackendTestApp\Application;
 
 
-use BackendTestApp\Application\DTO\ExampleFilter;
+use BackendTestApp\Application\DTO\QueryFilter;
 use BackendTestApp\Domain\Entity\Product;
 use BackendTestApp\Infrastructure\Repository\ProductRepository;
 use Psr\Log\LoggerInterface;
@@ -17,9 +17,9 @@ class ProductService
     ) {
     }
 
-    public function findByFilter(ExampleFilter $filter, ?int $userId = null): array
+    public function findByFilter(QueryFilter $filter): array
     {
-        return $this->productRepository->findByFilter($filter, $userId);
+        return $this->productRepository->findByFilter($filter);
     }
 
     public function getById(int $id): Product
@@ -43,5 +43,15 @@ class ProductService
     public function delete(Product $product): void
     {
         $this->productRepository->delete($product);
+    }
+
+    public function updateRemoveCountAndPriceForAll(Product $product){
+        $product->setCount($product->getCount() - 1);
+        $product->setPriceForAll($product->getCount() * $product->getPrice());
+    }
+
+    public function updateAddCountAndPriceForAll(Product $product){
+        $product->setCount($product->getCount() + 1);
+        $product->setPriceForAll($product->getCount() * $product->getPrice());
     }
 }

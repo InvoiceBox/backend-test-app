@@ -6,6 +6,7 @@ namespace BackendTestApp\Infrastructure\Repository;
 
 
 use BackendTestApp\Application\DTO\ExampleFilter;
+use BackendTestApp\Application\DTO\QueryFilter;
 use BackendTestApp\Domain\Entity\Product;
 use BackendTestApp\Domain\Exception\NotFound;
 use BackendTestApp\Infrastructure\RequestQueryBuilder;
@@ -45,18 +46,12 @@ class ProductRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function findByFilter(ExampleFilter $filter, ?int $userId = null): array
+    public function findByFilter(QueryFilter $filter): array
     {
-//        $qb = (new RequestQueryBuilder($this->getEntityManager()))
-//            ->createQueryBuilder($this->getClassName(), $filter);
-//
-//
-//        $qb->andWhere("LOWER(t.title) LIKE :query")
-//            ->setParameter('query', '%' . strtolower($filter->getQuery()) . '%');
-        $qb = $this->createQueryBuilder('p')
-            ->select('p');
+        $qb = (new RequestQueryBuilder($this->getEntityManager()))
+            ->createQueryBuilder($this->getClassName(), $filter);
+
 
         return $qb->getQuery()->getResult();
     }
-
 }

@@ -4,6 +4,7 @@
 namespace BackendTestApp\Infrastructure\Repository;
 
 
+use BackendTestApp\Application\DTO\QueryFilter;
 use BackendTestApp\Domain\Entity\OrderProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use BackendTestApp\Application\DTO\ExampleFilter;
@@ -29,7 +30,7 @@ class OrderProductRepository extends ServiceEntityRepository
         parent::__construct($registry, OrderProduct::class);
     }
 
-    public function fined(ExampleFilter $filter, int $userId)
+    public function findByFilterAndUserId(QueryFilter $filter, int $userId, int $orderId)
     {
         $fields = [
             'o.id',
@@ -42,11 +43,22 @@ class OrderProductRepository extends ServiceEntityRepository
             ->join('t.orderId', 'o')
             ->join('t.productId', 'p')
             ->where('o.userId = :userId')
+            ->andWhere('o.id = :orderId')
             ->setParameter('userId', $userId)
+            ->setParameter('orderId', $orderId)
             ->orderBy('o.id')
             ->getQuery()
             ->getResult();
-
     }
 
+    public function remove(OrderProduct $orderProduct){
+        $this->getEntityManager()->remove($orderProduct);
+        $this->getEntityManager()->flush();
+    }
+
+    public function save(OrderProduct $orderProduct)
+    {
+        $this->getEntityManager()->persist($orderProduct);
+        $this->getEntityManager()->flush();
+    }
 }

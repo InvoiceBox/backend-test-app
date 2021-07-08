@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace BackendTestApp\Domain\Entity;
 
 use BackendTestApp\Infrastructure\Repository\OrderRepository;
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\DateTimeType;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Date;
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\DateTime;
  * @ORM\Entity(repositoryClass=OrderRepository::class)
  * @ORM\Table(name="orders")
  */
-class Orders
+class Order
 {
     /**
      * @ORM\Id
@@ -30,21 +30,34 @@ class Orders
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read", "create", "update"})
+     * @Assert\NotBlank
+     * @Groups({"read", "create"})
      */
     private int $userId;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read", "create", "update"})
+     * @Assert\NotBlank
+     * @Groups({"read", "create"})
      */
     private int $amount;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"read", "create", "update"})
+     * @Assert\NotBlank
+     * @Assert\Type(
+     *     type="datetime",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
+     * @Groups({"read", "create"})
      */
     private $creationDate;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Groups({"read", "create", "update"})
+     */
+    private $comment;
 
     /**
      * @ORM\OneToMany(targetEntity=OrderProduct::class, mappedBy="orderId")
@@ -97,4 +110,15 @@ class Orders
         return $this;
     }
 
+    public function getComment(): ?int
+    {
+        return $this->userId;
+    }
+
+    public function setComment(string $comment): self
+    {
+        $this->comment = $comment;
+
+        return $this;
+    }
 }

@@ -23,5 +23,4 @@ class ProductFixture extends Fixture
         $manager->persist($product);
         $manager->flush();
     }
-
 }
